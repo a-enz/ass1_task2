@@ -81,7 +81,6 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 					}
 					
 				}, 5000);
-				startAlarm();
 			}
 		}
 	};
