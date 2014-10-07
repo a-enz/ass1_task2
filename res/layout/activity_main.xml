@@ -11,8 +11,8 @@
 
     <ToggleButton
         android:id="@+id/btn_toggleAlarm"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:onClick="onClickActivate" 
         android:text="@string/toggle_stopped"/>
 

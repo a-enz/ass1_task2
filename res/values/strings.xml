@@ -5,5 +5,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="toggle_stopped">activate Alarm</string>
-
+    <string name="toggle_running">stop Alarm</string>
+	<string name="theft_notification">Im being stolen!</string>
 </resources>

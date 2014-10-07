@@ -16,6 +16,7 @@ public abstract class AbstractMovementDetector implements SensorEventListener {
 	 * alarm should be fired, then calls antiTheftService.startAlarm() if a
 	 * deliberate movement is detected.
 	 */
+	
 	@Override
 	public final void onSensorChanged(SensorEvent event) {
 		float[] values;
