@@ -119,7 +119,7 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 	
 	@Override
 	public void onDestroy() {
-		if(mp.isPlaying()) {
+		if(mp != null && mp.isPlaying()) {
 			mp.stop();
 			mp.release();
 		}
