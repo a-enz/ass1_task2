@@ -34,6 +34,7 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 	private Handler handler;
 	private boolean codeRed;
 	private List<Float> dataSamples;
+	private AbstractAntiTheftService thisLis;
 	
 	private AbstractMovementDetector aMotionListener = new AbstractMovementDetector() {
 
@@ -56,7 +57,7 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 
 		@Override
 		protected boolean doAlarmLogic(float[] values) {
-			return values[0]*values[0] + values[1]*values[1] + values[2]*values[2] > 10000000;
+			return values[0]*values[0] + values[1]*values[1] + values[2]*values[2] > 100;
 		}
 		
 	};
@@ -64,10 +65,12 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 	private TriggerEventListener sMotionListener = new TriggerEventListener() {
 		public void onTrigger(TriggerEvent event) {
 			if(!codeRed && event.sensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
+				
 				codeRed = true;
 				handler = new Handler();
 				dataSamples = new ArrayList<Float>();
 				aSensor = sensMan.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+				aMotionListener.setCallbackService(thisLis);
 				sensMan.registerListener(aMotionListener, aSensor, SensorManager.SENSOR_DELAY_GAME);
 				handler.postDelayed(new Runnable() {
 
@@ -92,6 +95,7 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 		sensMan = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 		sSensor = sensMan.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 //		motionListener = new MotionListener();
+		thisLis = this;
 		sensMan.requestTriggerSensor(sMotionListener, sSensor);
 		
 		Log.d(ACTIVITY_TAG, "onStart");
@@ -141,15 +145,17 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 
 	@Override
 	public void startAlarm() {
-		mp = MediaPlayer.create(this, R.raw.alarm);
-		mp.setVolume(0.005f, 0.005f);
-		mp.setLooping(true);
-		mp.start();
+		if(mp == null) {
+			mp = MediaPlayer.create(this, R.raw.alarm);
+			mp.setVolume(0.005f, 0.005f);
+			mp.setLooping(true);
+			mp.start();
+		}
 	}
 	
 	@Override
 	public void onDestroy() {
-		if(mp.isPlaying()) {
+		if(mp != null && mp.isPlaying()) {
 			mp.stop();
 			mp.release();
 		}

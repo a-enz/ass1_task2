@@ -108,10 +108,10 @@ public class MainActivity extends ActionBarActivity {
     
     public void onClickActivate(View v){
     	tb = (ToggleButton) v;
+		bgAntiTheft = new Intent(this,AntiTheftServiceImpl.class);
     	
     	if(tb.isChecked()) {
     		
-    		bgAntiTheft = new Intent(this,AntiTheftServiceImpl.class);
     		
     		this.startService(bgAntiTheft);
     		
