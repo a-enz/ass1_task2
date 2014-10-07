@@ -146,7 +146,7 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 	public void startAlarm() {
 		if(mp == null) {
 			mp = MediaPlayer.create(this, R.raw.alarm);
-			mp.setVolume(0.005f, 0.005f);
+			mp.setVolume(1.0f, 1.0f);
 			mp.setLooping(true);
 			mp.start();
 		}
