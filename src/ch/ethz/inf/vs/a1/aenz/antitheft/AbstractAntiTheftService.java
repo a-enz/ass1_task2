@@ -5,7 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public abstract class AbstractAntiTheftService extends Service {
+
+public abstract class AbstractAntiTheftService extends Service{
 
 	protected AbstractMovementDetector listener;
 	private SensorManager sMan;

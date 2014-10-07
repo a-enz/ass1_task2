@@ -3,24 +3,44 @@ package ch.ethz.inf.vs.a1.aenz.antitheft;
 import java.net.ContentHandler;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-public class AntiTheftServiceImpl extends AbstractAntiTheftService {
+public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 
 	public static final String ACTIVITY_TAG = "### AntiTheft ###";
+	
+	private SensorManager sensMan;
+	//private MotionListener motionListener;
+	private Sensor sensor;
+	
+	private TriggerEventListener motionListener = new TriggerEventListener() {
+		public void onTrigger(TriggerEvent event) {
+			if(event.sensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
+				startAlarm();
+			}
+			
+		}
+	};
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		
+		sensMan = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+		sensor = sensMan.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+//		motionListener = new MotionListener();
+		sensMan.requestTriggerSensor(motionListener, sensor);
 		
 		Log.d(ACTIVITY_TAG, "onStart");
 
