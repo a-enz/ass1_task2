@@ -34,15 +34,20 @@ public class MainActivity extends ActionBarActivity {
         
         tb = (ToggleButton) findViewById(R.id.btn_toggleAlarm);
 
-        tb.setTextOff(this.getString(R.string.toggle_stopped));;
+        tb.setTextOff(this.getString(R.string.toggle_stopped));
         tb.setTextOn(this.getString(R.string.toggle_running));
         
         //initialize state of toggle button/application
 
-	    mPrefs = getSharedPreferences("pref", Context.MODE_PRIVATE);
+	    mPrefs = getApplicationContext().getSharedPreferences("pref", Context.MODE_PRIVATE);
    		SharedPreferences.Editor editor = mPrefs.edit();
-		editor.putBoolean("servicesRunning", false);
-		editor.commit();
+   		if (mPrefs.contains("servicesRunning")) {
+   			// do nothing
+   		} else {
+   			Log.d(ACTIVITY_TAG, "Initial persistance set!");
+   			editor.putBoolean("servicesRunning", false);
+   			editor.commit();
+   		}
     }
 
 
@@ -67,11 +72,12 @@ public class MainActivity extends ActionBarActivity {
     public void onResume(){
     	super.onResume();
 
-	    mPrefs = getSharedPreferences("pref", Context.MODE_PRIVATE);
-	    boolean tgpref = mPrefs.getBoolean("servicesRunning", false);
+	    boolean tgpref = mPrefs.getBoolean("servicesRunning", true);
 	    tb = (ToggleButton) findViewById(R.id.btn_toggleAlarm);
 		
 		Log.d(ACTIVITY_TAG, "resuming....");
+		Boolean tmp = mPrefs.contains("servicesRunning");
+		Log.d(ACTIVITY_TAG, "was the boolean found? " + tmp.toString());
 		
 	    if(tgpref) {
 			Log.d(ACTIVITY_TAG, "Hey I am on");
@@ -81,6 +87,7 @@ public class MainActivity extends ActionBarActivity {
 			Log.d(ACTIVITY_TAG, "What? I am out");
 	    	tb.setChecked(false);
 	    }
+	    
     }
     
     @Override
@@ -143,19 +150,23 @@ public class MainActivity extends ActionBarActivity {
     		//safe state of toggle button
 
     		Log.d(ACTIVITY_TAG, "We are setting the servicesRunning to TRUE");
-    	    mPrefs = getSharedPreferences("pref", Context.MODE_PRIVATE);
+
     		SharedPreferences.Editor editor = mPrefs.edit();
     		editor.putBoolean("servicesRunning", true);
-    		editor.commit();
+    		Boolean tmp = editor.commit();
+    		
     		Log.d(ACTIVITY_TAG, "The persistent boolean is now TRUE");
+    		
+    		Log.d(ACTIVITY_TAG, "Commit success: " + tmp.toString());
     		
     	} else {
     		
     		mNM.cancel(mId);
     		
     		//safe state of toggle button
+    		
+    		Log.d(ACTIVITY_TAG, "should i be here?");
 
-    	    mPrefs = getSharedPreferences("pref", Context.MODE_PRIVATE);
        		SharedPreferences.Editor editor = mPrefs.edit();
     		editor.putBoolean("servicesRunning", false);
     		editor.commit();
