@@ -26,6 +26,7 @@ public class MainActivity extends ActionBarActivity {
 	ToggleButton tb;
 	private SharedPreferences mPrefs;
 	final String PREF_NAME = "preferences";
+	private Intent bgAntiTheft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,7 @@ public class MainActivity extends ActionBarActivity {
     	
     	if(tb.isChecked()) {
     		
-    		Intent bgAntiTheft = new Intent(this,AntiTheftServiceImpl.class);
+    		bgAntiTheft = new Intent(this,AntiTheftServiceImpl.class);
     		
     		this.startService(bgAntiTheft);
     		
@@ -154,6 +155,7 @@ public class MainActivity extends ActionBarActivity {
 
     		SharedPreferences.Editor editor = mPrefs.edit();
     		editor.putBoolean("servicesRunning", true);
+    		
     		Boolean tmp = editor.commit();
     		
     		Log.d(ACTIVITY_TAG, "The persistent boolean is now TRUE");
@@ -168,13 +170,14 @@ public class MainActivity extends ActionBarActivity {
     		
     		Log.d(ACTIVITY_TAG, "should i be here?");
 
-    		// Destroy Service
-    		
-    		
     		// Undo persistance
        		SharedPreferences.Editor editor = mPrefs.edit();
     		editor.remove("servicesRunning");
     		editor.commit();
+    		// Destroy Service
+    		try {stopService(bgAntiTheft);} catch(IllegalStateException e){}
+    		
+
     	}
     }
 }

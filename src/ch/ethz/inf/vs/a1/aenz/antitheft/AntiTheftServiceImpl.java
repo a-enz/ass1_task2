@@ -8,6 +8,8 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
@@ -20,17 +22,37 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 
 	public static final String ACTIVITY_TAG = "### AntiTheft ###";
 	
+	private MediaPlayer mp;
+	
 	private SensorManager sensMan;
 	//private MotionListener motionListener;
-	private Sensor sensor;
+	private Sensor sSensor;
+	private Sensor aSensor;
 	
-	private TriggerEventListener motionListener = new TriggerEventListener() {
+	private TriggerEventListener sMotionListener = new TriggerEventListener() {
 		public void onTrigger(TriggerEvent event) {
 			if(event.sensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
 				startAlarm();
+				
 			}
 			
 		}
+	};
+	
+	private SensorEventListener aMotionListener = new SensorEventListener() {
+
+		@Override
+		public void onAccuracyChanged(Sensor arg0, int arg1) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onSensorChanged(SensorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	};
 
 	@Override
@@ -38,9 +60,9 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 		super.onStartCommand(intent, flags, startId);
 		
 		sensMan = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-		sensor = sensMan.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+		sSensor = sensMan.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 //		motionListener = new MotionListener();
-		sensMan.requestTriggerSensor(motionListener, sensor);
+		sensMan.requestTriggerSensor(sMotionListener, sSensor);
 		
 		Log.d(ACTIVITY_TAG, "onStart");
 
@@ -89,10 +111,19 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 
 	@Override
 	public void startAlarm() {
-		MediaPlayer mp = MediaPlayer.create(this, R.raw.alarm);
-		mp.setVolume(0.1f, 0.1f);
+		mp = MediaPlayer.create(this, R.raw.alarm);
+		mp.setVolume(0.005f, 0.005f);
 		mp.setLooping(true);
 		mp.start();
+	}
+	
+	@Override
+	public void onDestroy() {
+		if(mp.isPlaying()) {
+			mp.stop();
+			mp.release();
+		}
+		try {sensMan.cancelTriggerSensor(sMotionListener, sSensor);} catch (Exception e){};
 	}
 
 	@Override
