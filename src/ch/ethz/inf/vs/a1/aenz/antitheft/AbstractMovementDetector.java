@@ -3,9 +3,11 @@ package ch.ethz.inf.vs.a1.aenz.antitheft;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.util.Log;
 
 public abstract class AbstractMovementDetector implements SensorEventListener {
 	protected AbstractAntiTheftService antiTheftService;
+	private static final String ACTIVITY_TAG = "### AbsMV ###";
 
 	public void setCallbackService(AbstractAntiTheftService service) {
 		antiTheftService = service;
@@ -19,6 +21,7 @@ public abstract class AbstractMovementDetector implements SensorEventListener {
 	
 	@Override
 	public final void onSensorChanged(SensorEvent event) {
+		Log.d(ACTIVITY_TAG, "SENSOR event ");
 		float[] values;
 		values = event.values;
 		
