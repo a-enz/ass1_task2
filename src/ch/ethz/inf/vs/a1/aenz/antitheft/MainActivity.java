@@ -37,6 +37,8 @@ public class MainActivity extends ActionBarActivity {
         tb.setTextOff(this.getString(R.string.toggle_stopped));
         tb.setTextOn(this.getString(R.string.toggle_running));
         
+        
+		mNM = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //initialize state of toggle button/application
 
 	    mPrefs = getApplicationContext().getSharedPreferences("pref", Context.MODE_PRIVATE);
@@ -139,11 +141,10 @@ public class MainActivity extends ActionBarActivity {
     		mBuilder.setContentIntent(resultPendingIntent);
 
     		
-    		mNM = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     		// mId allows you to update the notification later on.
     		Notification note = mBuilder.build();
-    		note.flags |= Notification.FLAG_NO_CLEAR;
-    		note.flags |= Notification.FLAG_ONGOING_EVENT;
+    		//note.flags |= Notification.FLAG_NO_CLEAR;
+    		//note.flags |= Notification.FLAG_ONGOING_EVENT;
     		
     		mNM.notify(mId, note);
     		
@@ -167,8 +168,12 @@ public class MainActivity extends ActionBarActivity {
     		
     		Log.d(ACTIVITY_TAG, "should i be here?");
 
+    		// Destroy Service
+    		
+    		
+    		// Undo persistance
        		SharedPreferences.Editor editor = mPrefs.edit();
-    		editor.putBoolean("servicesRunning", false);
+    		editor.remove("servicesRunning");
     		editor.commit();
     	}
     }
