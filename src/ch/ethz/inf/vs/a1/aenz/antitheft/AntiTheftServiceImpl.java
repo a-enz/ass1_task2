@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.a1.aenz.antitheft;
 
 import java.net.ContentHandler;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -14,6 +16,7 @@ import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -28,32 +31,59 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 	//private MotionListener motionListener;
 	private Sensor sSensor;
 	private Sensor aSensor;
+	private Handler handler;
+	private boolean codeRed;
+	private List<Float> dataSamples;
 	
-	private TriggerEventListener sMotionListener = new TriggerEventListener() {
-		public void onTrigger(TriggerEvent event) {
-			if(event.sensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
-				startAlarm();
-				
-			}
-			
-		}
-	};
-	
-	private SensorEventListener aMotionListener = new SensorEventListener() {
+	private AbstractMovementDetector aMotionListener = new AbstractMovementDetector() {
+
+		
+//		@Override
+//		public void onAccuracyChanged(Sensor arg0, int arg1) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//
+//		@Override
+//		public void onSensorChanged(SensorEvent event) {
+//			float[] data = event.values;
+//			float amp;
+//			if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+//				amp = data[0]*data[0] + data[1]*data[1] + data[2]*data[2];
+//				dataSamples.add(amp);
+//			}
+//		}
 
 		@Override
-		public void onAccuracyChanged(Sensor arg0, int arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onSensorChanged(SensorEvent arg0) {
-			// TODO Auto-generated method stub
-			
+		protected boolean doAlarmLogic(float[] values) {
+			return values[0]*values[0] + values[1]*values[1] + values[2]*values[2] > 10000000;
 		}
 		
 	};
+	
+	private TriggerEventListener sMotionListener = new TriggerEventListener() {
+		public void onTrigger(TriggerEvent event) {
+			if(!codeRed && event.sensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
+				codeRed = true;
+				handler = new Handler();
+				dataSamples = new ArrayList<Float>();
+				aSensor = sensMan.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+				sensMan.registerListener(aMotionListener, aSensor, SensorManager.SENSOR_DELAY_GAME);
+				handler.postDelayed(new Runnable() {
+
+					@Override
+					public void run() {
+						sensMan.unregisterListener(aMotionListener);
+						codeRed = false;
+					}
+					
+				}, 5000);
+				startAlarm();
+			}
+		}
+	};
+	
+
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -130,6 +160,19 @@ public class AntiTheftServiceImpl extends AbstractAntiTheftService{
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public float[] box(List<Float> arg){
+		float[] res = new float[0];
+		int i = 0;
+		if(arg != null) {
+			res = new float[arg.size()];
+			for(Float f : arg) {
+				res[i] = f;
+				i++;
+			}
+		}
+		return res;
 	}
 
 }

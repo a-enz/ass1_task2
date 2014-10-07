@@ -22,10 +22,13 @@ public abstract class AbstractMovementDetector implements SensorEventListener {
 	@Override
 	public final void onSensorChanged(SensorEvent event) {
 		Log.d(ACTIVITY_TAG, "SENSOR event ");
-		float[] values;
-		values = event.values;
+		boolean isAlarm = false;
 		
-		boolean isAlarm = doAlarmLogic(values);
+		
+// Extract values here
+		if(event.sensor.TYPE_ACCELEROMETER == Sensor.TYPE_ACCELEROMETER) {
+			isAlarm = doAlarmLogic(event.values);
+		}
 		if (isAlarm) {
 			((AbstractAntiTheftService) antiTheftService).startAlarm();
 		}
